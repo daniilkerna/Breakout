@@ -63,7 +63,6 @@ public class BounceGame extends StateBasedGame {
 	 * Create the BounceGame frame, saving the width and height for later use.
 	 * 
 	 * @param title
-	 *            the window's title
 	 * @param width
 	 *            the window's width
 	 * @param height
