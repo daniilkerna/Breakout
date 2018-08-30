@@ -13,4 +13,5 @@
  
 1. Add destructible bricks 
 2. Add a controllable paddle
-3. Add lives remaining indicator 
+3. Add lives remaining indicator
+4.
