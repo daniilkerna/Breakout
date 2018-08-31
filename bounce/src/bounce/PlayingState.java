@@ -54,27 +54,40 @@ class PlayingState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 		
 		if (input.isKeyDown(Input.KEY_W)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.001f)));
+			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.01f)));
 		}
 		if (input.isKeyDown(Input.KEY_S)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, +.001f)));
+			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, +.01f)));
 		}
 		if (input.isKeyDown(Input.KEY_A)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(-.001f, 0)));
+			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(-.01f, 0)));
 		}
 		if (input.isKeyDown(Input.KEY_D)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(+.001f, 0f)));
+			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(+.01f, 0f)));
 		}
 		// bounce the ball...
 		boolean bounced = false;
-		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth
-				|| bg.ball.getCoarseGrainedMinX() < 0) {
+		if (bg.ball.getCoarseGrainedMaxX() >= bg.ScreenWidth
+				|| bg.ball.getCoarseGrainedMinX() <= 0) {
 			bg.ball.bounce(90);
 			bounced = true;
-		} else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight
-				|| bg.ball.getCoarseGrainedMinY() < 0) {
+			if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth) {
+				bg.ball.setX(bg.ScreenWidth - bg.ball.getCoarseGrainedWidth());
+			}
+			if (bg.ball.getCoarseGrainedMinX() < 0) {
+				bg.ball.setCoarseGrainedMinX(1);
+			}
+
+		} else if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight
+				|| bg.ball.getCoarseGrainedMinY() <= 0) {
 			bg.ball.bounce(0);
 			bounced = true;
+			if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight) {
+				bg.ball.setY(bg.ScreenHeight - bg.ball.getCoarseGrainedHeight());
+			}
+			if (bg.ball.getCoarseGrainedMinY() < 0) {
+				bg.ball.setCoarseGrainedMinY(1);
+			}
 		}
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
@@ -89,7 +102,7 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 10) {
+		if (bounces >= 500) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}

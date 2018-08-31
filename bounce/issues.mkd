@@ -11,7 +11,7 @@
 
 ## Open Issues ##
  
-1. Add destructible bricks 
+1. Corrected collision response
 2. Add a controllable paddle
 3. Add lives remaining indicator
-4.
+4. Add destructible bricks
