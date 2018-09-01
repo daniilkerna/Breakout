@@ -1,6 +1,7 @@
 package bounce;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import jig.Vector;
 
@@ -24,6 +25,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 class PlayingState extends BasicGameState {
 	int bounces;
+	int livesRemain;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -33,6 +35,7 @@ class PlayingState extends BasicGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		bounces = 0;
+		livesRemain = 5;
 		container.setSoundOn(true);
 	}
 	@Override
@@ -44,6 +47,7 @@ class PlayingState extends BasicGameState {
         bg.paddle.render(g);
 
 		g.drawString("Bounces: " + bounces, 10, 30);
+		g.drawString("Lives: " + livesRemain, 10, 50);
 		for (Bang b : bg.explosions)
 			b.render(g);
 	}
@@ -75,10 +79,12 @@ class PlayingState extends BasicGameState {
 			bg.ball.bounce(90);
 			bounced = true;
 			if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth) {
-				bg.ball.setX(bg.ScreenWidth - bg.ball.getCoarseGrainedWidth());
+				bg.ball.setCoarseGrainedMinX(bg.ScreenWidth - bg.ball.getCoarseGrainedWidth() - 1);
+                bg.ball.update(delta);
 			}
-			if (bg.ball.getCoarseGrainedMinX() < 0) {
-				bg.ball.setCoarseGrainedMinX(1);
+			if (bg.ball.getX() < 0) {
+				bg.ball.setX(1);
+                bg.ball.update(delta);
 			}
 
 		} else if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight
@@ -87,19 +93,27 @@ class PlayingState extends BasicGameState {
 			bounced = true;
 
 			if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight) {
-				bg.ball.setY(bg.ScreenHeight - bg.ball.getCoarseGrainedHeight());
+				//bg.ball.setY(bg.ScreenHeight - bg.ball.getCoarseGrainedHeight());
 				lifeLost = true;
 			}
 			if (bg.ball.getCoarseGrainedMinY() < 0) {
 				bg.ball.setCoarseGrainedMinY(1);
+				bg.ball.setVelocity(bg.ball.getVelocity().abs());
+
 			}
 		}
 		if (bounced){
 			bounces++;
+			System.out.println(bg.ball.getPosition());
+			System.out.println(bg.ball.getCoarseGrainedMinX());
 		}
 
 		if(lifeLost){
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+            livesRemain--;
+            bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
+            bg.ball.setVelocity(new Vector(randomSign() * .1f, .2f));
+
         }
 		bg.ball.update(delta);
 
@@ -116,14 +130,14 @@ class PlayingState extends BasicGameState {
 
         // check if the paddle is bouncing the ball
         if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight - bg.paddle.getHeight() ){
-            System.out.println(bg.ball.getCoarseGrainedMaxY());
+            //System.out.println(bg.ball.getCoarseGrainedMaxY());
             if (checkPaddleReflection(bg.paddle , bg.ball) ){
                 bounces++;
                 bg.ball.bounce(0);
 
                 //makes sure the ball doesn't get stuck in the paddle
                 if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight - bg.paddle.getHeight() ) {
-                    bg.ball.setY(bg.ScreenHeight - bg.paddle.getHeight() - bg.ball.getCoarseGrainedHeight());
+                    bg.ball.setCoarseGrainedMinY(bg.ScreenHeight - bg.paddle.getHeight() - bg.ball.getCoarseGrainedHeight() - 1);
                 }
             }
         }
@@ -135,7 +149,7 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 500) {
+		if (bounces >= 500 || livesRemain <= 0) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}
@@ -159,5 +173,16 @@ class PlayingState extends BasicGameState {
 	    else
 	        return false;
     }
+
+    public static float getRandomFloat(){
+        Random r = new Random();
+        float random = .1f + r.nextFloat() * (.3f + .1f);
+        return random;
+        }
+
+        public int randomSign(){
+            Random r = new Random();
+            return r.nextBoolean() ? 1 : -1;
+        }
 	
 }
