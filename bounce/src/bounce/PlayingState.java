@@ -41,6 +41,8 @@ class PlayingState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 		
 		bg.ball.render(g);
+        bg.paddle.render(g);
+
 		g.drawString("Bounces: " + bounces, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -67,6 +69,7 @@ class PlayingState extends BasicGameState {
 		}
 		// bounce the ball...
 		boolean bounced = false;
+		boolean lifeLost = false;
 		if (bg.ball.getCoarseGrainedMaxX() >= bg.ScreenWidth
 				|| bg.ball.getCoarseGrainedMinX() <= 0) {
 			bg.ball.bounce(90);
@@ -82,18 +85,48 @@ class PlayingState extends BasicGameState {
 				|| bg.ball.getCoarseGrainedMinY() <= 0) {
 			bg.ball.bounce(0);
 			bounced = true;
-			if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight) {
+
+			if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight) {
 				bg.ball.setY(bg.ScreenHeight - bg.ball.getCoarseGrainedHeight());
+				lifeLost = true;
 			}
 			if (bg.ball.getCoarseGrainedMinY() < 0) {
 				bg.ball.setCoarseGrainedMinY(1);
 			}
 		}
-		if (bounced) {
-			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+		if (bounced){
 			bounces++;
 		}
+
+		if(lifeLost){
+            bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+        }
 		bg.ball.update(delta);
+
+		//control the paddle
+
+        if (input.isKeyDown(Input.KEY_RIGHT)) {
+            if (bg.paddle.getxLoc() + bg.paddle.getWidth() < bg.ScreenWidth )
+                bg.paddle.movePaddleRight();
+        }
+        if (input.isKeyDown(Input.KEY_LEFT)) {
+            if (bg.paddle.getxLoc() >= 5)
+                bg.paddle.movePaddleLeft();
+        }
+
+        // check if the paddle is bouncing the ball
+        if (bg.ball.getCoarseGrainedMaxY() >= bg.ScreenHeight - bg.paddle.getHeight() ){
+            System.out.println(bg.ball.getCoarseGrainedMaxY());
+            if (checkPaddleReflection(bg.paddle , bg.ball) ){
+                bounces++;
+                bg.ball.bounce(0);
+
+                //makes sure the ball doesn't get stuck in the paddle
+                if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight - bg.paddle.getHeight() ) {
+                    bg.ball.setY(bg.ScreenHeight - bg.paddle.getHeight() - bg.ball.getCoarseGrainedHeight());
+                }
+            }
+        }
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
@@ -112,5 +145,19 @@ class PlayingState extends BasicGameState {
 	public int getID() {
 		return BounceGame.PLAYINGSTATE;
 	}
+
+	public boolean checkPaddleReflection(Paddle paddle, Ball ball){
+	    float minPaddle = paddle.getxLoc();
+	    float maxPaddle = minPaddle + paddle.getWidth();
+	    float minBall = ball.getCoarseGrainedMinX();
+	    float maxBall = ball.getCoarseGrainedMaxX();
+
+	    if (minBall >= minPaddle && minBall <= maxPaddle )
+	        return true;
+	    else if (maxBall >= minPaddle && maxBall <= maxPaddle)
+	        return true;
+	    else
+	        return false;
+    }
 	
 }

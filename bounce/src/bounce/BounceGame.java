@@ -2,6 +2,7 @@ package bounce;
 
 import java.util.ArrayList;
 
+import jig.ConvexPolygon;
 import jig.Entity;
 import jig.ResourceManager;
 
@@ -57,6 +58,7 @@ public class BounceGame extends StateBasedGame {
 	public final int ScreenHeight;
 
 	Ball ball;
+	Paddle paddle;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -101,6 +103,7 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
+		paddle = new Paddle(ScreenWidth / 2, ScreenHeight - 20 , 100, 20);
 
 	}
 	
