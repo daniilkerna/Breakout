@@ -37,16 +37,22 @@ class PlayingState extends BasicGameState {
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
+        BounceGame bg = (BounceGame)game;
+
 		bounces = 0;
 		livesRemain = 5;
 		numberOfBallActive = 10;
 		container.setSoundOn(true);
 
+		//reset the ball
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, randomSign() * .2f));
+        bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
+
 		//initialize bricks
 		brickArray = new ArrayList<Brick>(10);
 		for (int b = 0; b < 10; b++){
 			brickArray.add(new Brick((b * 78) + 50 , 30));
-			System.out.println("just made new brick");
+			//System.out.println("just made new brick");
 		}
 	}
 	@Override
@@ -59,6 +65,8 @@ class PlayingState extends BasicGameState {
 
 		g.drawString("Bounces: " + bounces, 10, 30);
 		g.drawString("Lives: " + livesRemain, 10, 50);
+        g.drawString("Level 1" , 10, 70);
+
 		for (Bang b : bg.explosions)
 			b.render(g);
 		for (Brick b : brickArray)
@@ -73,15 +81,19 @@ class PlayingState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 		
 		if (input.isKeyDown(Input.KEY_W)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.01f)));
+		    if (bg.ball.getVelocity().getY() > -1f)
+			    bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.01f)));
 		}
 		if (input.isKeyDown(Input.KEY_S)) {
+            if (bg.ball.getVelocity().getY() < 1f)
 			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, +.01f)));
 		}
 		if (input.isKeyDown(Input.KEY_A)) {
+            if (bg.ball.getVelocity().getX() > -1f)
 			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(-.01f, 0)));
 		}
 		if (input.isKeyDown(Input.KEY_D)) {
+            if (bg.ball.getVelocity().getX() < 1f)
 			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(+.01f, 0f)));
 		}
 		// bounce the ball...
@@ -176,10 +188,15 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 500 || livesRemain <= 0 || numberOfBallActive == 0) {
+		if (bounces >= 500 || livesRemain <= 0 ) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}
+
+		if ( numberOfBallActive == 0){
+            ((PlayingStateLevel2)game.getState(BounceGame.PLAYINGSTATELEVEL2)).setUserScore(bounces);
+		    game.enterState(BounceGame.PLAYINGSTATELEVEL2);
+        }
 	}
 
 	@Override
