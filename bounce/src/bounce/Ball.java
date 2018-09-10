@@ -1,8 +1,11 @@
 package bounce;
 
+import jig.ConvexPolygon;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 
 /**
  * The Ball class is an Entity that has a velocity (since it's moving). When
@@ -13,14 +16,18 @@ import jig.Vector;
  class Ball extends Entity {
 
 	private Vector velocity;
-	private int countdown;
+	private ConvexPolygon shape;
+	private int bouncesBall;
 
 	public Ball(final float x, final float y, final float vx, final float vy) {
 		super(x, y);
-		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_BALLIMG_RSC));
+		//addImageWithBoundingBox(ResourceManager.getImage(BounceGame.BALL_WHITE));
+
 		velocity = new Vector(vx, vy);
-		countdown = 0;
+		bouncesBall = 0;
+		shape = new ConvexPolygon(5f);
+		addShape(shape,  Color.white, Color.white);
+		//addImageWithBoundingBox(ResourceManager.getImage(BounceGame.BALL_WHITE));
 	}
 
 	public void setVelocity(final Vector v) {
@@ -43,7 +50,6 @@ import jig.Vector;
 //		removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
 //		addImageWithBoundingBox(ResourceManager
 //				.getImage(BounceGame.BALL_BROKENIMG_RSC));
-		countdown = 500;
 		velocity = velocity.bounce(surfaceTangent);
 	}
 
@@ -55,14 +61,19 @@ import jig.Vector;
 	 */
 	public void update(final int delta) {
 		translate(velocity.scale(delta));
-		if (countdown > 0) {
-			countdown -= delta;
-			if (countdown <= 0) {
-				addImageWithBoundingBox(ResourceManager
-						.getImage(BounceGame.BALL_BALLIMG_RSC));
-				removeImage(ResourceManager
-						.getImage(BounceGame.BALL_BROKENIMG_RSC));
-			}
-		}
+
 	}
+
+	public void incrementBall(){
+		this.bouncesBall++;
+	}
+
+	public void setBouncesBall(int count){
+		this.bouncesBall = count;
+	}
+
+	public int getBouncesBall(){
+		return this.bouncesBall;
+	}
+
 }
