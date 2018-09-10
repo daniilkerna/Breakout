@@ -29,13 +29,14 @@ class PlayingStateLevel2 extends BasicGameState{
         BounceGame bg = (BounceGame)game;
 
         //bounces = 0;
-        livesRemain = 5;
+        livesRemain = 3;
         numberOfBallActive = 20;
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .1f, randomSign() * .2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
+        bg.paddle.setScale(1);
 
         //initialize bricks
         brickArray = new ArrayList<Brick>(20);
@@ -86,7 +87,7 @@ class PlayingStateLevel2 extends BasicGameState{
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             livesRemain--;
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.2f));
+            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
 
         }
         bg.ball.update(delta);

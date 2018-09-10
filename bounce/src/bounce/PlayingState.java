@@ -40,12 +40,14 @@ class PlayingState extends BasicGameState {
         BounceGame bg = (BounceGame)game;
 
 		bounces = 0;
-		livesRemain = 5;
+		livesRemain = 3;
 		numberOfBallActive = 10;
 		container.setSoundOn(true);
 
+        bg.paddle.setScale(1);
+
 		//reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .1f, randomSign() * .2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.2f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.ball.setBouncesBall(0);
 
@@ -103,6 +105,7 @@ class PlayingState extends BasicGameState {
         bg.paddle.update(delta);
 
 
+
         // check if the paddle is bouncing the ball
 		if (bg.ball.collides(bg.paddle) != null){
 			bg.ball.bounce(0);
@@ -115,7 +118,7 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		//check for collision with the ball and paddles
+		//check for collision with the ball and bricks
 		for (Brick b : brickArray){
 			if (!b.getDestroyed()) { //if ball is active
 				if (bg.ball.collides(b) != null) {

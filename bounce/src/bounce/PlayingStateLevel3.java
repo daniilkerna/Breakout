@@ -31,25 +31,28 @@ class PlayingStateLevel3 extends BasicGameState{
         BounceGame bg = (BounceGame)game;
 
         //bounces = 0;
-        livesRemain = 5;
-        numberOfBallActive = 30;
+        livesRemain = 3;
+        numberOfBallActive = 120;
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .1f, randomSign() * .2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .3f, -.4f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.paddle.setScale(.5f);
 
         //initialize bricks
-        brickArray = new ArrayList<Brick>(30);
-        for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 30 , true));
+        brickArray = new ArrayList<Brick>(100);
+        for (int b = 0; b < 40; b++){
+            brickArray.add(new Brick((b * 20) + 10, 10, true));
         }
-        for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 85 , true));
+        for (int b = 0; b < 40; b++){
+            brickArray.add(new Brick((b * 20) + 10 , 35 , true));
         }
-        for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 140 , true));
+        for (int b = 0; b < 40; b++){
+            brickArray.add(new Brick((b * 20) + 10 , 60, true));
+        }
+        for (Brick b : brickArray){
+                b.setScale(.5f);
         }
     }
     @Override
@@ -93,7 +96,7 @@ class PlayingStateLevel3 extends BasicGameState{
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             livesRemain--;
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.2f));
+            bg.ball.setVelocity(new Vector(randomSign() * .3f, -.4f));
 
         }
         bg.ball.update(delta);
@@ -142,6 +145,13 @@ class PlayingStateLevel3 extends BasicGameState{
                 i.remove();
             }
         }
+        //clear removed bricks
+        for (Iterator <Brick> i = brickArray.iterator(); i.hasNext(); ){
+            if (i.next().getDestroyed()){
+                i.remove();
+                System.out.println("Brick Removed");
+            }
+        }
 
 
         if (bounces >= 500 || livesRemain <= 0 || numberOfBallActive == 0) {
@@ -149,7 +159,7 @@ class PlayingStateLevel3 extends BasicGameState{
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
-        clearDestroyedBricks();
+        //clearDestroyedBricks();
     }
 
     @Override
