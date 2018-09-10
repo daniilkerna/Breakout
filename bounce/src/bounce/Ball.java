@@ -3,6 +3,7 @@ package bounce;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
+import org.newdawn.slick.Graphics;
 
 /**
  * The Ball class is an Entity that has a velocity (since it's moving). When
@@ -14,6 +15,7 @@ import jig.Vector;
 
 	private Vector velocity;
 	private int countdown;
+	private int bouncesBall;
 
 	public Ball(final float x, final float y, final float vx, final float vy) {
 		super(x, y);
@@ -21,6 +23,7 @@ import jig.Vector;
 				.getImage(BounceGame.BALL_BALLIMG_RSC));
 		velocity = new Vector(vx, vy);
 		countdown = 0;
+		bouncesBall = 0;
 	}
 
 	public void setVelocity(final Vector v) {
@@ -65,4 +68,17 @@ import jig.Vector;
 			}
 		}
 	}
+
+	public void incrementBall(){
+		this.bouncesBall++;
+	}
+
+	public void setBouncesBall(int count){
+		this.bouncesBall = count;
+	}
+
+	public int getBouncesBall(){
+		return this.bouncesBall;
+	}
+
 }

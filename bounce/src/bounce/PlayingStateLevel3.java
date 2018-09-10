@@ -13,7 +13,9 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
-class PlayingStateLevel2 extends BasicGameState{
+import javax.swing.text.html.HTMLDocument;
+
+class PlayingStateLevel3 extends BasicGameState{
     int bounces;
     int livesRemain;
     int numberOfBallActive;
@@ -30,22 +32,24 @@ class PlayingStateLevel2 extends BasicGameState{
 
         //bounces = 0;
         livesRemain = 5;
-        numberOfBallActive = 20;
+        numberOfBallActive = 30;
         container.setSoundOn(true);
 
         //reset the ball
         bg.ball.setVelocity(new Vector(randomSign() * .1f, randomSign() * .2f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
+        bg.paddle.setScale(.5f);
 
         //initialize bricks
-        brickArray = new ArrayList<Brick>(20);
+        brickArray = new ArrayList<Brick>(30);
         for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 30));
-            //System.out.println("just made new brick");
+            brickArray.add(new Brick((b * 78) + 50 , 30 , true));
         }
         for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 80));
-            //System.out.println("just made new brick");
+            brickArray.add(new Brick((b * 78) + 50 , 85 , true));
+        }
+        for (int b = 0; b < 10; b++){
+            brickArray.add(new Brick((b * 78) + 50 , 140 , true));
         }
     }
     @Override
@@ -58,12 +62,15 @@ class PlayingStateLevel2 extends BasicGameState{
 
         g.drawString("Bounces: " + bg.ball.getBouncesBall(), 10, 30);
         g.drawString("Lives: " + livesRemain, 10, 50);
-        g.drawString("Level 2" , 10, 70);
+        g.drawString("Level 3" , 10, 70);
 
         for (Bang b : bg.explosions)
             b.render(g);
-        for (Brick b : brickArray)
-            b.render(g);
+        for (Brick b : brickArray){
+            if (!b.getDestroyed())
+                b.render(g);
+        }
+
     }
 
     @Override
@@ -112,11 +119,18 @@ class PlayingStateLevel2 extends BasicGameState{
         for (Brick b : brickArray){
             if (!b.getDestroyed()) { //if ball is active
                 if (bg.ball.collides(b) != null) {
-                    b.setDestroyed(true);
-                    bg.ball.bounce(0);
-                    numberOfBallActive--;
-                    b.setPosition(-100, -100);    //remove off screen
-                    //brickArray.remove(b);
+                    if (b.getCracked()){
+                        numberOfBallActive--;
+                        b.setDestroyed(true);
+                        b.setPosition(-100, -100);    //remove off screen
+                    }
+                    else{
+                        b.setCracked(true);
+                    }
+
+                    bg.ball.setVelocity(new Vector(bg.ball.getVelocity().getX(), -bg.ball.getVelocity().getY()));
+
+
                 }
             }
         }
@@ -130,19 +144,17 @@ class PlayingStateLevel2 extends BasicGameState{
         }
 
 
-        if (bounces >= 500 || livesRemain <= 0 ) {
+        if (bounces >= 500 || livesRemain <= 0 || numberOfBallActive == 0) {
             ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
-        if ( numberOfBallActive == 0){
-            game.enterState(BounceGame.PLAYINGSTATELEVEL3);
-        }
+        clearDestroyedBricks();
     }
 
     @Override
     public int getID() {
-        return BounceGame.PLAYINGSTATELEVEL2;
+        return BounceGame.PLAYINGSTATELEVEL3;
     }
 
     public boolean checkPaddleReflection(PaddleEntity paddle, Ball ball){
@@ -172,6 +184,16 @@ class PlayingStateLevel2 extends BasicGameState{
 
     public void setUserScore(int bounces) {
         this.bounces = bounces;
+    }
+
+    public void clearDestroyedBricks(){
+        Iterator itr = brickArray.iterator();
+        while (itr.hasNext())
+        {
+            Brick x = (Brick) itr.next();
+            if (x.getDestroyed())
+                itr.remove();
+        }
     }
 
 }
