@@ -66,7 +66,7 @@ class StartUpState extends BasicGameState {
 		bg.bounceBallScreen();
 
 		bg.ball.update(delta);
-		System.out.println("Ball position" + bg.ball.getPosition());
+		//System.out.println("Ball position" + bg.ball.getPosition());
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {

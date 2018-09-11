@@ -72,6 +72,8 @@ public class BounceGame extends StateBasedGame {
 
 	public final int ScreenWidth;
 	public final int ScreenHeight;
+	public int livesRemaining = 3;
+	public int highScore = 0;
 
 	Ball ball;
 	PaddleEntity paddle;
@@ -229,8 +231,62 @@ public class BounceGame extends StateBasedGame {
 		if (input.isKeyDown(Input.KEY_3)){
 			enterState(3);
 		}
-
 	}
 
+	public void bounceBallPaddle(){
+		if (ball.collides(paddle) != null){
+			ball.bounce(0);
+			ball.incrementBall();
+
+			//control which way the ball is bouncing
+			if (ball.getPosition().getX() >= paddle.getxLoc()){
+				ball.setVelocity(new Vector(Math.abs(ball.getVelocity().getX()) , ball.getVelocity().getY()));
+			}
+			else{
+				ball.setVelocity(new Vector(-Math.abs(ball.getVelocity().getX()) , ball.getVelocity().getY()));
+			}
+
+
+			//makes sure the ball doesn't get stuck in the paddle
+			if (ball.getCoarseGrainedMaxY() > ScreenHeight - paddle.getHeight() ) {
+				ball.setY(ScreenHeight - paddle.getHeight() - ball.getCoarseGrainedHeight()/2 - 1);
+				ball.setVelocity(new Vector(ball.getVelocity().getX(), -Math.abs(ball.getVelocity().getY() ) ));
+			}
+		}
+	}
+
+	public void reflectBallFromBrick(Brick b, Ball ball){
+		if (Math.abs(b.getX() - ball.getPosition().getX() ) <=  Math.abs(b.getY() - ball.getPosition().getY())){
+			ball.bounce(0);
+		}
+		else{
+			ball.bounce(90);
+		}
+	}
+
+	public int getLivesRemaining(){
+		return this.livesRemaining;
+	}
+
+	public void loseLife(){
+		this.livesRemaining--;
+	}
+
+	public void setLivesReaning(int score){
+		this.livesRemaining = score;
+	}
+
+	public void setHighScore(int score){
+		if (this.highScore == 0){
+			this.highScore = score;
+		}
+
+		else if (score < this.highScore)
+			this.highScore = score;
+	}
+
+	public int getHighScore(){
+		return this.highScore;
+	}
 	
 }

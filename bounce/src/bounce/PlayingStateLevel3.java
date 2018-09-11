@@ -17,7 +17,6 @@ import javax.swing.text.html.HTMLDocument;
 
 class PlayingStateLevel3 extends BasicGameState{
     int bounces;
-    int livesRemain;
     int numberOfBallActive;
     ArrayList <Brick> brickArray;
 
@@ -31,14 +30,13 @@ class PlayingStateLevel3 extends BasicGameState{
         BounceGame bg = (BounceGame)game;
 
         //bounces = 0;
-        livesRemain = 3;
         numberOfBallActive = 120;
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .3f, -.4f));
+        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
-        bg.paddle.setScale(.5f);
+        bg.paddle.setScale(1);
 
         //initialize bricks
         brickArray = new ArrayList<Brick>(100);
@@ -46,10 +44,10 @@ class PlayingStateLevel3 extends BasicGameState{
             brickArray.add(new Brick((b * 20) + 10, 10, true));
         }
         for (int b = 0; b < 40; b++){
-            brickArray.add(new Brick((b * 20) + 10 , 35 , true));
+            brickArray.add(new Brick((b * 20) + 10 , 50 , true));
         }
         for (int b = 0; b < 40; b++){
-            brickArray.add(new Brick((b * 20) + 10 , 60, true));
+            brickArray.add(new Brick((b * 20) + 10 , 90, true));
         }
         for (Brick b : brickArray){
                 b.setScale(.5f);
@@ -64,7 +62,7 @@ class PlayingStateLevel3 extends BasicGameState{
         bg.paddle.render(g);
 
         g.drawString("Bounces: " + bg.ball.getBouncesBall(), 10, 30);
-        g.drawString("Lives: " + livesRemain, 10, 50);
+        g.drawString("Lives: " + bg.getLivesRemaining(), 10, 50);
         g.drawString("Level 3" , 10, 70);
 
         for (Bang b : bg.explosions)
@@ -94,9 +92,9 @@ class PlayingStateLevel3 extends BasicGameState{
 
         if(lifeLost){
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
-            livesRemain--;
+            bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .3f, -.4f));
+            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
 
         }
         bg.ball.update(delta);
@@ -107,33 +105,28 @@ class PlayingStateLevel3 extends BasicGameState{
 
 
         // check if the paddle is bouncing the ball
-        if (bg.ball.collides(bg.paddle) != null){
-            bg.ball.bounce(0);
-            bg.ball.incrementBall();
+        bg.bounceBallPaddle();
 
-            //makes sure the ball doesn't get stuck in the paddle
-            if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight - bg.paddle.getHeight() ) {
-                bg.ball.setY(bg.ScreenHeight - bg.paddle.getHeight() - bg.ball.getCoarseGrainedHeight()/2 - 1);
-                bg.ball.setVelocity(new Vector(bg.ball.getVelocity().getX(), -Math.abs(bg.ball.getVelocity().getY() ) ));
-            }
-        }
-
+        boolean removedBrick = false;
         //check for collision with the ball and paddles
-        for (Brick b : brickArray){
-            if (!b.getDestroyed()) { //if ball is active
-                if (bg.ball.collides(b) != null) {
-                    if (b.getCracked()){
-                        numberOfBallActive--;
-                        b.setDestroyed(true);
-                        b.setPosition(-100, -100);    //remove off screen
+        if (bg.ball.getPosition().getY() < bg.ScreenHeight) {
+            for (Brick b : brickArray) {
+                if (!b.getDestroyed()) { //if ball is active
+                    if (bg.ball.collides(b) != null) {
+                        if (b.getCracked()) {
+                            numberOfBallActive--;
+                            b.setDestroyed(true);
+                            b.setPosition(-100, -100);    //remove off screen
+                        } else {
+                            b.setCracked(true);
+                            removedBrick = true;
+                        }
+
+                        //bg.ball.setVelocity(new Vector(bg.ball.getVelocity().getX(), -bg.ball.getVelocity().getY()));
+
+                        bg.reflectBallFromBrick(b, bg.ball);
+
                     }
-                    else{
-                        b.setCracked(true);
-                    }
-
-                    bg.ball.setVelocity(new Vector(bg.ball.getVelocity().getX(), -bg.ball.getVelocity().getY()));
-
-
                 }
             }
         }
@@ -146,15 +139,19 @@ class PlayingStateLevel3 extends BasicGameState{
             }
         }
         //clear removed bricks
-        for (Iterator <Brick> i = brickArray.iterator(); i.hasNext(); ){
-            if (i.next().getDestroyed()){
-                i.remove();
-                System.out.println("Brick Removed");
+        if (removedBrick) {
+            int j = 0;
+            for (Iterator<Brick> i = brickArray.iterator(); i.hasNext(); ) {
+                if (i.next().getDestroyed()) {
+                    i.remove();
+                }
+                j++;
             }
+            System.out.println("Number of bricks left: " + j);
         }
 
 
-        if (bounces >= 500 || livesRemain <= 0 || numberOfBallActive == 0) {
+        if (bounces >= 500 || bg.getLivesRemaining() <= 0 || numberOfBallActive == 0) {
             ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
             game.enterState(BounceGame.GAMEOVERSTATE);
         }

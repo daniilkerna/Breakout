@@ -36,6 +36,8 @@ class GameOverState extends BasicGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		timer = 4000;
+		BounceGame bg = (BounceGame)game;
+		bg.setHighScore(bg.ball.getBouncesBall());
 	}
 
 	public void setUserScore(int bounces) {
@@ -47,7 +49,8 @@ class GameOverState extends BasicGameState {
 			Graphics g) throws SlickException {
 
 		BounceGame bg = (BounceGame)game;
-		g.drawString("Bounces: " + bg.ball.getBouncesBall(), 10, 30);
+		g.drawString("Your score: " + bg.ball.getBouncesBall(), 225, 340);
+		g.drawString("High score: " + bg.getHighScore(), 225, 370);
 		for (Bang b : bg.explosions)
 			b.render(g);
 		g.drawImage(ResourceManager.getImage(BounceGame.GAMEOVER_BANNER_RSC), 225,
