@@ -13,6 +13,13 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.SwingConstants;
+
 /**
  * A Simple Game of Bounce.
  * 
@@ -51,6 +58,7 @@ public class BounceGame extends StateBasedGame {
 	public static final int PLAYINGSTATELEVEL3 = 3;
 
 	public static final int GAMEOVERSTATE = 4;
+	public static final int SPLASHSCREEN = 5;
 	
 	public static final String BALL_BALLIMG_RSC = "bounce/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "bounce/resource/brokenball.png";
@@ -60,6 +68,7 @@ public class BounceGame extends StateBasedGame {
 	public static final String BANG_EXPLOSIONSND_RSC = "bounce/resource/explosion.wav";
 	public static final String PADDLE_RSC = "bounce/resource/basic-small-rectangle.png";
 	public static final String BALL_WHITE = "bounce/resource/white-ball.png";
+	public static final String SPLASH_RSC = "bounce/resource/splash.png";
 
 	public final int ScreenWidth;
 	public final int ScreenHeight;
@@ -91,11 +100,13 @@ public class BounceGame extends StateBasedGame {
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
+		addState(new SplashScreen());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingStateLevel2());
 		addState(new PlayingStateLevel3());
 		addState(new PlayingState());
+
 
 
 		
@@ -113,8 +124,9 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		ResourceManager.loadImage(BALL_WHITE);
+		ResourceManager.loadImage(SPLASH_RSC);
 		
-		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .4f, .4f);
+		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, 0, 0);
 		paddle = new PaddleEntity(ScreenWidth / 2, ScreenHeight - 10, 100, 20);
 		paddle.setScale(1);
 
@@ -123,6 +135,9 @@ public class BounceGame extends StateBasedGame {
 	public static void main(String[] args) {
 		AppGameContainer app;
 		try {
+			//splash screen
+
+
 			app = new AppGameContainer(new BounceGame("Bounce!", 800, 600));
 			app.setDisplayMode(800, 600, false);
 			app.setVSync(true);
