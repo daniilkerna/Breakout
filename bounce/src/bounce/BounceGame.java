@@ -13,6 +13,13 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.SwingConstants;
+
 /**
  * A Simple Game of Bounce.
  * 
@@ -51,6 +58,7 @@ public class BounceGame extends StateBasedGame {
 	public static final int PLAYINGSTATELEVEL3 = 3;
 
 	public static final int GAMEOVERSTATE = 4;
+	public static final int SPLASHSCREEN = 5;
 	
 	public static final String BALL_BALLIMG_RSC = "bounce/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "bounce/resource/brokenball.png";
@@ -60,9 +68,12 @@ public class BounceGame extends StateBasedGame {
 	public static final String BANG_EXPLOSIONSND_RSC = "bounce/resource/explosion.wav";
 	public static final String PADDLE_RSC = "bounce/resource/basic-small-rectangle.png";
 	public static final String BALL_WHITE = "bounce/resource/white-ball.png";
+	public static final String SPLASH_RSC = "bounce/resource/splash.png";
 
 	public final int ScreenWidth;
 	public final int ScreenHeight;
+	public int livesRemaining = 3;
+	public int highScore = 0;
 
 	Ball ball;
 	PaddleEntity paddle;
@@ -91,11 +102,13 @@ public class BounceGame extends StateBasedGame {
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
+		addState(new SplashScreen());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingStateLevel2());
 		addState(new PlayingStateLevel3());
 		addState(new PlayingState());
+
 
 
 		
@@ -113,8 +126,9 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		ResourceManager.loadImage(BALL_WHITE);
+		ResourceManager.loadImage(SPLASH_RSC);
 		
-		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .4f, .4f);
+		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, 0, 0);
 		paddle = new PaddleEntity(ScreenWidth / 2, ScreenHeight - 10, 100, 20);
 		paddle.setScale(1);
 
@@ -123,6 +137,9 @@ public class BounceGame extends StateBasedGame {
 	public static void main(String[] args) {
 		AppGameContainer app;
 		try {
+			//splash screen
+
+
 			app = new AppGameContainer(new BounceGame("Bounce!", 800, 600));
 			app.setDisplayMode(800, 600, false);
 			app.setVSync(true);
@@ -214,8 +231,62 @@ public class BounceGame extends StateBasedGame {
 		if (input.isKeyDown(Input.KEY_3)){
 			enterState(3);
 		}
-
 	}
 
+	public void bounceBallPaddle(){
+		if (ball.collides(paddle) != null){
+			ball.bounce(0);
+			ball.incrementBall();
+
+			//control which way the ball is bouncing
+			if (ball.getPosition().getX() >= paddle.getxLoc()){
+				ball.setVelocity(new Vector(Math.abs(ball.getVelocity().getX()) , ball.getVelocity().getY()));
+			}
+			else{
+				ball.setVelocity(new Vector(-Math.abs(ball.getVelocity().getX()) , ball.getVelocity().getY()));
+			}
+
+
+			//makes sure the ball doesn't get stuck in the paddle
+			if (ball.getCoarseGrainedMaxY() > ScreenHeight - paddle.getHeight() ) {
+				ball.setY(ScreenHeight - paddle.getHeight() - ball.getCoarseGrainedHeight()/2 - 1);
+				ball.setVelocity(new Vector(ball.getVelocity().getX(), -Math.abs(ball.getVelocity().getY() ) ));
+			}
+		}
+	}
+
+	public void reflectBallFromBrick(Brick b, Ball ball){
+		if (Math.abs(b.getX() - ball.getPosition().getX() ) <=  Math.abs(b.getY() - ball.getPosition().getY())){
+			ball.bounce(0);
+		}
+		else{
+			ball.bounce(90);
+		}
+	}
+
+	public int getLivesRemaining(){
+		return this.livesRemaining;
+	}
+
+	public void loseLife(){
+		this.livesRemaining--;
+	}
+
+	public void setLivesReaning(int score){
+		this.livesRemaining = score;
+	}
+
+	public void setHighScore(int score){
+		if (this.highScore == 0){
+			this.highScore = score;
+		}
+
+		else if (score < this.highScore)
+			this.highScore = score;
+	}
+
+	public int getHighScore(){
+		return this.highScore;
+	}
 	
 }
