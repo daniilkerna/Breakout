@@ -13,8 +13,10 @@
 2. Add a controllable paddle
 3. Add lives remaining indicator
 4. Add destructible bricks
+5. Add multiple levels
+6. Add a splash screen
+7. Make levels more interesting
 
 ## Open Issues ##
 
-5. Add multiple levels
-6. Add a splash screen
+8. Add a demo Mode

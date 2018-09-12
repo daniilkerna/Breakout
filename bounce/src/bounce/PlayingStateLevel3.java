@@ -95,10 +95,10 @@ class PlayingStateLevel3 extends BasicGameState{
         bg.controlBallSpeed();
         bg.controlLevel();
 
-        bg.toggleDemoMode();
 
+        bg.toggleDemoMode();
         if (bg.isDemoModeOn()){
-            bg.paddle.setxLoc(bg.ball.getX());
+            bg.playDemoMode();
         }
 
         // bounce the ball...

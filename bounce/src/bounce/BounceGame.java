@@ -49,7 +49,8 @@ import javax.swing.SwingConstants;
  * 
  * 
  * @author wallaces
- * 
+ *
+ * @author Daniil Kernazhytski
  */
 public class BounceGame extends StateBasedGame {
 	
@@ -222,6 +223,7 @@ public class BounceGame extends StateBasedGame {
 		}
 	}
 
+	// cheat codes for changing levels
 	public void controlLevel(){
 		Input input = this.getContainer().getInput();
 		if (input.isKeyDown(Input.KEY_1)){
@@ -235,6 +237,7 @@ public class BounceGame extends StateBasedGame {
 		}
 	}
 
+	//reflect the ball off the paddle.
 	public void bounceBallPaddle(){
 		if (ball.collides(paddle) != null){
 			ball.bounce(0);
@@ -257,6 +260,7 @@ public class BounceGame extends StateBasedGame {
 		}
 	}
 
+	//reflect ball from brick, check if reflecs of the sides or top and bottom
 	public void reflectBallFromBrick(Brick b, Ball ball){
 		if (Math.abs(b.getX() - ball.getPosition().getX() ) <=  Math.abs(b.getY() - ball.getPosition().getY())){
 			ball.bounce(0);
@@ -284,7 +288,7 @@ public class BounceGame extends StateBasedGame {
 			this.highScore = score;
 		}
 
-		else if (score < this.highScore)
+		else if (score > this.highScore)
 			this.highScore = score;
 	}
 
@@ -305,6 +309,18 @@ public class BounceGame extends StateBasedGame {
 		Input input = this.getContainer().getInput();
 		if (input.isKeyDown(Input.KEY_5)){
 			this.demoModeOn = !this.demoModeOn;
+		}
+	}
+
+	//plays the game somewhat imperfectly
+	public void playDemoMode(){
+		if ( ball.getX() > paddle.getCoarseGrainedMaxX()){
+			if (paddle.getxLoc() + paddle.getCoarseGrainedWidth()/2 < ScreenWidth )
+				paddle.movePaddleRight();
+		}
+		else if (ball.getX() < paddle.getCoarseGrainedMinX()) {
+			if (paddle.getxLoc() - paddle.getCoarseGrainedWidth()/2 >= 5)
+				paddle.movePaddleLeft();
 		}
 	}
 	
