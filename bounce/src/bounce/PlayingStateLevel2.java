@@ -78,6 +78,11 @@ class PlayingStateLevel2 extends BasicGameState{
         bg.controlBallSpeed();
         bg.controlLevel();
 
+        bg.toggleDemoMode();
+        if (bg.isDemoModeOn()){
+            bg.playDemoMode();
+        }
+
         // bounce the ball...
         boolean lifeLost = false;
 
