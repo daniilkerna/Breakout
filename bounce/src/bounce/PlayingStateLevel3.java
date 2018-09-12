@@ -16,9 +16,9 @@ import org.newdawn.slick.state.StateBasedGame;
 import javax.swing.text.html.HTMLDocument;
 
 class PlayingStateLevel3 extends BasicGameState{
-    int bounces;
     int numberOfBallActive;
     ArrayList <Brick> brickArray;
+    ArrayList <Brick> brickArrayIndestructible;
 
     @Override
     public void init(GameContainer container, StateBasedGame game)
@@ -34,20 +34,27 @@ class PlayingStateLevel3 extends BasicGameState{
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.paddle.setScale(1);
 
         //initialize bricks
         brickArray = new ArrayList<Brick>(numberOfBallActive);
-        for (int b = 0; b < 20; b++){
-            brickArray.add(new Brick((b * 40) + 20, 20, true));
+        brickArrayIndestructible = new ArrayList<Brick>( 30);
+        for (int b = 0; b < 5; b++){
+            brickArrayIndestructible.add(new Brick((b * 160) + 190, 30, true, true));
+        }
+        for (int b = 0; b < 5; b++){
+            brickArrayIndestructible.add(new Brick((b * 160) + 110, 70, true, true));
         }
         for (int b = 0; b < 20; b++){
-            brickArray.add(new Brick((b * 40) + 20 , 60 , true));
+            brickArray.add(new Brick((b * 40) + 10, 10, true));
         }
         for (int b = 0; b < 20; b++){
-            brickArray.add(new Brick((b * 40) + 20, 100, true));
+            brickArray.add(new Brick((b * 40) + 10 , 50 , true));
+        }
+        for (int b = 0; b < 20; b++){
+            brickArray.add(new Brick((b * 40) + 10, 90, true));
         }
         for (Brick b : brickArray){
                 b.setScale(.5f);
@@ -68,6 +75,10 @@ class PlayingStateLevel3 extends BasicGameState{
         for (Bang b : bg.explosions)
             b.render(g);
         for (Brick b : brickArray){
+            if (!b.getDestroyed())
+                b.render(g);
+        }
+        for (Brick b : brickArrayIndestructible){
             if (!b.getDestroyed())
                 b.render(g);
         }
@@ -94,7 +105,7 @@ class PlayingStateLevel3 extends BasicGameState{
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
+            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
 
         }
         bg.ball.update(delta);
@@ -133,6 +144,17 @@ class PlayingStateLevel3 extends BasicGameState{
             }
         }
 
+        //check collisions with "bricks"
+        if (bg.ball.getPosition().getY() < bg.ScreenHeight) {
+            for (Brick b : brickArrayIndestructible) {
+                if (!b.getDestroyed()) { //if ball is active
+                    if (bg.ball.collides(b) != null) {
+                        bg.reflectBallFromBrick(b, bg.ball);
+                    }
+                }
+            }
+        }
+
 
         // check if there are any finished explosions, if so remove them
         for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
@@ -148,12 +170,13 @@ class PlayingStateLevel3 extends BasicGameState{
         }
 
 
-        if (bounces >= 500 || bg.getLivesRemaining() <= 0 || numberOfBallActive == 0) {
+        if (bg.getLivesRemaining() <= 0 || numberOfBallActive == 0) {
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
         if (brickArray.size() == 0){
-            ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
+            bg.setHighScore(bg.ball.getBouncesBall());
+            ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bg.ball.getBouncesBall());
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
@@ -190,9 +213,6 @@ class PlayingStateLevel3 extends BasicGameState{
         return r.nextBoolean() ? 1 : -1;
     }
 
-    public void setUserScore(int bounces) {
-        this.bounces = bounces;
-    }
 
     public void clearDestroyedBricks(){
         Iterator itr = brickArray.iterator();

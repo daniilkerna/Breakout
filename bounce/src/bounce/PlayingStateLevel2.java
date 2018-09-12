@@ -14,7 +14,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 class PlayingStateLevel2 extends BasicGameState{
-    int bounces;
     int numberOfBallActive;
     ArrayList <Brick> brickArray;
 
@@ -32,18 +31,22 @@ class PlayingStateLevel2 extends BasicGameState{
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.paddle.setScale(1);
 
         //initialize bricks
-        brickArray = new ArrayList<Brick>(20);
+        brickArray = new ArrayList<Brick>(30);
         for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 30));
+            brickArray.add(new Brick((b * 80) + 20 , 20));
             //System.out.println("just made new brick");
         }
         for (int b = 0; b < 10; b++){
-            brickArray.add(new Brick((b * 78) + 50 , 80));
+            brickArray.add(new Brick((b * 80) + 60, 60));
+            //System.out.println("just made new brick");
+        }
+        for (int b = 0; b < 10; b++){
+            brickArray.add(new Brick((b * 80) + 20, 100));
             //System.out.println("just made new brick");
         }
     }
@@ -85,7 +88,7 @@ class PlayingStateLevel2 extends BasicGameState{
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
+            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
 
         }
         bg.ball.update(delta);
@@ -128,7 +131,7 @@ class PlayingStateLevel2 extends BasicGameState{
         }
 
 
-        if (bounces >= 500 || bg.getLivesRemaining() <= 0 ) {
+        if (bg.getLivesRemaining() <= 0 ) {
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
@@ -165,10 +168,6 @@ class PlayingStateLevel2 extends BasicGameState{
     public int randomSign(){
         Random r = new Random();
         return r.nextBoolean() ? 1 : -1;
-    }
-
-    public void setUserScore(int bounces) {
-        this.bounces = bounces;
     }
 
     public void clearDestroyedBricks(){

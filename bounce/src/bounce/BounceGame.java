@@ -1,6 +1,7 @@
 package bounce;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import jig.ConvexPolygon;
 import jig.Entity;
@@ -262,6 +263,7 @@ public class BounceGame extends StateBasedGame {
 		else{
 			ball.bounce(90);
 		}
+
 	}
 
 	public int getLivesRemaining(){
@@ -287,6 +289,11 @@ public class BounceGame extends StateBasedGame {
 
 	public int getHighScore(){
 		return this.highScore;
+	}
+
+	public int randomSign(){
+		Random r = new Random();
+		return r.nextBoolean() ? 1 : -1;
 	}
 	
 }

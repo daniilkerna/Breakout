@@ -46,7 +46,7 @@ class PlayingState extends BasicGameState {
         bg.paddle.setScale(1);
 
 		//reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.ball.setBouncesBall(0);
 
@@ -54,8 +54,6 @@ class PlayingState extends BasicGameState {
 		brickArray = new ArrayList<Brick>(10);
 		for (int b = 0; b < 20; b++){
 			brickArray.add(new Brick((b * 40) + 20 , 20));
-			//brickArray.add(new Brick(20, 20));
-			//System.out.println("just made new brick");
 		}
 
 //		for (Brick b : brickArray){
@@ -100,7 +98,7 @@ class PlayingState extends BasicGameState {
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
+            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
 
         }
 
@@ -144,7 +142,7 @@ class PlayingState extends BasicGameState {
 
 
 
-        if (bounces >= 500 || bg.getLivesRemaining() <= 0 ) {
+        if (bg.getLivesRemaining() <= 0 ) {
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}
 
