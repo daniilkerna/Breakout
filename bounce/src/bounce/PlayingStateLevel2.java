@@ -99,6 +99,7 @@ class PlayingStateLevel2 extends BasicGameState{
         bg.bounceBallPaddle();
 
         //check for collision with the ball and paddles
+        boolean removedBrick = false;
         for (Brick b : brickArray){
             if (!b.getDestroyed()) { //if ball is active
                 if (bg.ball.collides(b) != null) {
@@ -107,6 +108,7 @@ class PlayingStateLevel2 extends BasicGameState{
                     numberOfBallActive--;
                     b.setPosition(-100, -100);    //remove off screen
                     //brickArray.remove(b);
+                    removedBrick = true;
                 }
             }
         }
@@ -119,13 +121,18 @@ class PlayingStateLevel2 extends BasicGameState{
             }
         }
 
+        //clear removed bricks
+        if (removedBrick) {
+            clearDestroyedBricks();
+            System.out.println("Brick Left :" + brickArray.size());
+        }
+
 
         if (bounces >= 500 || bg.getLivesRemaining() <= 0 ) {
-            ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 
-        if ( numberOfBallActive == 0){
+        if ( brickArray.size() == 0){
             game.enterState(BounceGame.PLAYINGSTATELEVEL3);
         }
     }
@@ -162,6 +169,16 @@ class PlayingStateLevel2 extends BasicGameState{
 
     public void setUserScore(int bounces) {
         this.bounces = bounces;
+    }
+
+    public void clearDestroyedBricks(){
+        Iterator itr = brickArray.iterator();
+        while (itr.hasNext())
+        {
+            Brick x = (Brick) itr.next();
+            if (x.getDestroyed())
+                itr.remove();
+        }
     }
 
 }

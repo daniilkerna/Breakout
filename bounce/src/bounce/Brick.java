@@ -40,29 +40,15 @@ public class Brick extends Entity {
         return this.isDestroyed;
     }
 
-    public void setCracked(boolean value) { this.isCracked = value; }
+    public void setCracked(boolean value) { this.isCracked = value;
+        removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
+        addImageWithBoundingBox(ResourceManager.getImage(BounceGame.BALL_BROKENIMG_RSC));
+    }
 
     public boolean getCracked() { return this.isCracked;  }
 
-    public void render (Graphics g){
-        if (!isDestroyed && !isMultipleTouchReq){
-            super.render(g);
-        }
-
-        else if (isMultipleTouchReq && !isCracked){
-            super.render(g);
-        }
-        else if (isMultipleTouchReq && isCracked){
-            removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
-		    addImageWithBoundingBox(ResourceManager.getImage(BounceGame.BALL_BROKENIMG_RSC));
-		    super.render(g);
-        }
-        else if (isDestroyed){
-            //do nothing
-        }
-        else{
-            super.render(g);
-        }
-    }
+//    public void render (Graphics g){
+//
+//    }
 
 }

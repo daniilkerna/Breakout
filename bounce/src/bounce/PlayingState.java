@@ -40,22 +40,27 @@ class PlayingState extends BasicGameState {
 
 		bounces = 0;
 		bg.setLivesReaning(3);
-		numberOfBallActive = 10;
+		numberOfBallActive = 20;
 		container.setSoundOn(true);
 
         bg.paddle.setScale(1);
 
 		//reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.2f));
+        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.ball.setBouncesBall(0);
 
 		//initialize bricks
 		brickArray = new ArrayList<Brick>(10);
-		for (int b = 0; b < 10; b++){
-			brickArray.add(new Brick((b * 78) + 50 , 30));
+		for (int b = 0; b < 20; b++){
+			brickArray.add(new Brick((b * 40) + 20 , 20));
+			//brickArray.add(new Brick(20, 20));
 			//System.out.println("just made new brick");
 		}
+
+//		for (Brick b : brickArray){
+//			System.out.println("Width" + b.getCoarseGrainedWidth() + "Height : "  + b.getCoarseGrainedHeight());
+//		}
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -95,7 +100,7 @@ class PlayingState extends BasicGameState {
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.2f));
+            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.2f));
 
         }
 
@@ -109,6 +114,7 @@ class PlayingState extends BasicGameState {
 		bg.bounceBallPaddle();
 
 		//check for collision with the ball and bricks
+		boolean removedBrick = false;
 		for (Brick b : brickArray){
 			if (!b.getDestroyed()) { //if ball is active
 				if (bg.ball.collides(b) != null) {
@@ -117,6 +123,7 @@ class PlayingState extends BasicGameState {
 					numberOfBallActive--;
 					b.setPosition(-100, -100);    //remove off screen
 					//brickArray.remove(b);
+					removedBrick = true;
 				}
 			}
 		}
@@ -129,15 +136,19 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
+		//clear removed bricks
+		if (removedBrick) {
+			clearDestroyedBricks();
+			System.out.println("Brick Left :" + brickArray.size());
+		}
+
 
 
         if (bounces >= 500 || bg.getLivesRemaining() <= 0 ) {
-			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}
 
-		if ( numberOfBallActive == 0){
-            ((PlayingStateLevel2)game.getState(BounceGame.PLAYINGSTATELEVEL2)).setUserScore(bounces);
+		if ( brickArray.size() == 0){
 		    game.enterState(BounceGame.PLAYINGSTATELEVEL2);
         }
 	}
@@ -171,5 +182,15 @@ class PlayingState extends BasicGameState {
             Random r = new Random();
             return r.nextBoolean() ? 1 : -1;
         }
+
+	public void clearDestroyedBricks(){
+		Iterator itr = brickArray.iterator();
+		while (itr.hasNext())
+		{
+			Brick x = (Brick) itr.next();
+			if (x.getDestroyed())
+				itr.remove();
+		}
+	}
 	
 }

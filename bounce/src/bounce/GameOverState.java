@@ -37,7 +37,7 @@ class GameOverState extends BasicGameState {
 	public void enter(GameContainer container, StateBasedGame game) {
 		timer = 4000;
 		BounceGame bg = (BounceGame)game;
-		bg.setHighScore(bg.ball.getBouncesBall());
+		//bg.setHighScore(bg.ball.getBouncesBall());
 	}
 
 	public void setUserScore(int bounces) {
