@@ -63,11 +63,11 @@ public class Paddle {
     }
 
     public void movePaddleLeft(){
-        setxLoc(getxLoc() - 10);
+        setxLoc(getxLoc() - 40);
     }
 
     public void movePaddleRight(){
-        setxLoc(getxLoc() + 10);
+        setxLoc(getxLoc() + 40);
     }
 
 

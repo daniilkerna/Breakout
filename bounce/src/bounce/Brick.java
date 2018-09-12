@@ -1,16 +1,19 @@
 package bounce;
 
 import bounce.BounceGame;
+import jig.ConvexPolygon;
 import jig.Entity;
 import jig.ResourceManager;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 public class Brick extends Entity {
     private boolean isDestroyed;
-
+    private ConvexPolygon shape;
     final private boolean isMultipleTouchReq;
     private boolean isCracked;
+    private boolean isIndestructible;
 
     public Brick (final float x , final float y){
         super(x,y);
@@ -20,6 +23,7 @@ public class Brick extends Entity {
         this.isDestroyed = false;
         this.isMultipleTouchReq = false;
         this.isCracked = false;
+        this.isIndestructible = false;
     }
 
     public Brick (final float x , final float y, final boolean isMultipleTouchReq){
@@ -30,6 +34,18 @@ public class Brick extends Entity {
         this.isDestroyed = false;
         this.isMultipleTouchReq = isMultipleTouchReq;
         this.isCracked = false;
+        this.isIndestructible = false;
+    }
+
+    public Brick (final float x , final float y , final boolean isMultipleTouchReq , final boolean isIndestructible){
+        super(x,y);
+
+        this.isDestroyed = false;
+        this.isMultipleTouchReq = isMultipleTouchReq;
+        this.isCracked = false;
+        this.isIndestructible = isIndestructible;
+        shape = new ConvexPolygon(20f, 20f);
+        addShape(shape,  Color.red, Color.red);
     }
 
     public void setDestroyed(boolean value ){
@@ -46,6 +62,10 @@ public class Brick extends Entity {
     }
 
     public boolean getCracked() { return this.isCracked;  }
+
+    public boolean getIsDestructible(){
+        return this.isIndestructible;
+    }
 
 //    public void render (Graphics g){
 //

@@ -1,6 +1,7 @@
 package bounce;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import jig.ConvexPolygon;
 import jig.Entity;
@@ -74,6 +75,7 @@ public class BounceGame extends StateBasedGame {
 	public final int ScreenHeight;
 	public int livesRemaining = 3;
 	public int highScore = 0;
+	public boolean demoModeOn = false;
 
 	Ball ball;
 	PaddleEntity paddle;
@@ -262,6 +264,7 @@ public class BounceGame extends StateBasedGame {
 		else{
 			ball.bounce(90);
 		}
+
 	}
 
 	public int getLivesRemaining(){
@@ -287,6 +290,22 @@ public class BounceGame extends StateBasedGame {
 
 	public int getHighScore(){
 		return this.highScore;
+	}
+
+	public int randomSign(){
+		Random r = new Random();
+		return r.nextBoolean() ? 1 : -1;
+	}
+
+	public boolean isDemoModeOn(){
+		return this.demoModeOn;
+	}
+
+	public void toggleDemoMode(){
+		Input input = this.getContainer().getInput();
+		if (input.isKeyDown(Input.KEY_5)){
+			this.demoModeOn = !this.demoModeOn;
+		}
 	}
 	
 }
