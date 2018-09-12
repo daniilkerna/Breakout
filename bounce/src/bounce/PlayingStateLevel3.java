@@ -34,7 +34,7 @@ class PlayingStateLevel3 extends BasicGameState{
         container.setSoundOn(true);
 
         //reset the ball
-        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
+        bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.paddle.setScale(1);
 
@@ -95,6 +95,12 @@ class PlayingStateLevel3 extends BasicGameState{
         bg.controlBallSpeed();
         bg.controlLevel();
 
+        bg.toggleDemoMode();
+
+        if (bg.isDemoModeOn()){
+            bg.paddle.setxLoc(bg.ball.getX());
+        }
+
         // bounce the ball...
         boolean lifeLost = false;
 
@@ -105,7 +111,7 @@ class PlayingStateLevel3 extends BasicGameState{
             bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
             bg.loseLife();
             bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
-            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
+            bg.ball.setVelocity(new Vector(randomSign() * .2f, -.3f));
 
         }
         bg.ball.update(delta);
