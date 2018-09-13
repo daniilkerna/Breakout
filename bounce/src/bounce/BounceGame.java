@@ -75,6 +75,7 @@ public class BounceGame extends StateBasedGame {
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 	public int livesRemaining = 3;
+	public int currentScore = 0;
 	public int highScore = 0;
 	public boolean demoModeOn = false;
 
@@ -284,11 +285,7 @@ public class BounceGame extends StateBasedGame {
 	}
 
 	public void setHighScore(int score){
-		if (this.highScore == 0){
-			this.highScore = score;
-		}
-
-		else if (score > this.highScore)
+		if (score > this.highScore)
 			this.highScore = score;
 	}
 
@@ -299,6 +296,18 @@ public class BounceGame extends StateBasedGame {
 	public int randomSign(){
 		Random r = new Random();
 		return r.nextBoolean() ? 1 : -1;
+	}
+
+	public void incrementCurrentScore(){
+		this.currentScore++;
+	}
+
+	public int getCurrentScore(){
+		return this.currentScore;
+	}
+
+	public void resetCurrentScore(){
+		this.currentScore = 0;
 	}
 
 	public boolean isDemoModeOn(){

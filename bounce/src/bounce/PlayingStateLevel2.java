@@ -131,6 +131,7 @@ class PlayingStateLevel2 extends BasicGameState{
 
         //clear removed bricks
         if (removedBrick) {
+            bg.incrementCurrentScore();
             clearDestroyedBricks();
             System.out.println("Brick Left :" + brickArray.size());
         }

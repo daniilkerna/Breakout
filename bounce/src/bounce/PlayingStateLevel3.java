@@ -171,6 +171,7 @@ class PlayingStateLevel3 extends BasicGameState{
 
         //clear removed bricks
         if (removedBrick) {
+            bg.incrementCurrentScore();
             clearDestroyedBricks();
             System.out.println("Brick Left :" + brickArray.size());
         }
@@ -181,8 +182,6 @@ class PlayingStateLevel3 extends BasicGameState{
         }
 
         if (brickArray.size() == 0){
-            bg.setHighScore(bg.ball.getBouncesBall());
-            ((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bg.ball.getBouncesBall());
             game.enterState(BounceGame.GAMEOVERSTATE);
         }
 

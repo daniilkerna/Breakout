@@ -40,7 +40,7 @@ public class SplashScreen extends BasicGameState {
 
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
                 bg.enterState(BounceGame.STARTUPSTATE);
             }
             catch(InterruptedException ex)
