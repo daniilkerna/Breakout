@@ -49,6 +49,7 @@ class PlayingState extends BasicGameState {
         bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
         bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
         bg.ball.setBouncesBall(0);
+        bg.resetCurrentScore();
 
 		//initialize bricks
 		brickArray = new ArrayList<Brick>(10);
@@ -142,10 +143,10 @@ class PlayingState extends BasicGameState {
 
 		//clear removed bricks
 		if (removedBrick) {
+			bg.incrementCurrentScore();
 			clearDestroyedBricks();
 			System.out.println("Brick Left :" + brickArray.size());
 		}
-
 
 
         if (bg.getLivesRemaining() <= 0 ) {
