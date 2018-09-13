@@ -1,6 +1,8 @@
 package bounce;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import jig.Vector;
 
@@ -24,6 +26,8 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 class PlayingState extends BasicGameState {
 	int bounces;
+	int numberOfBallActive;
+	ArrayList <Brick> brickArray;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -32,8 +36,30 @@ class PlayingState extends BasicGameState {
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
+        BounceGame bg = (BounceGame)game;
+
 		bounces = 0;
+		bg.setLivesReaning(3);
+		numberOfBallActive = 20;
 		container.setSoundOn(true);
+
+        bg.paddle.setScale(1);
+
+		//reset the ball
+        bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
+        bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
+        bg.ball.setBouncesBall(0);
+        bg.resetCurrentScore();
+
+		//initialize bricks
+		brickArray = new ArrayList<Brick>(10);
+		for (int b = 0; b < 20; b++){
+			brickArray.add(new Brick((b * 40) + 20 , 20));
+		}
+
+//		for (Brick b : brickArray){
+//			System.out.println("Width" + b.getCoarseGrainedWidth() + "Height : "  + b.getCoarseGrainedHeight());
+//		}
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -41,8 +67,15 @@ class PlayingState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 		
 		bg.ball.render(g);
-		g.drawString("Bounces: " + bounces, 10, 30);
+        bg.paddle.render(g);
+
+		g.drawString("Bounces: " + bg.ball.getBouncesBall() , 10, 30);
+		g.drawString("Lives: " + bg.getLivesRemaining(), 10, 50);
+        g.drawString("Level 1" , 10, 70);
+
 		for (Bang b : bg.explosions)
+			b.render(g);
+		for (Brick b : brickArray)
 			b.render(g);
 	}
 
@@ -50,37 +83,56 @@ class PlayingState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game,
 			int delta) throws SlickException {
 
+
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
-		
-		if (input.isKeyDown(Input.KEY_W)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.001f)));
+
+		bg.controlBallSpeed();
+        bg.controlLevel();
+
+		bg.toggleDemoMode();
+		if (bg.isDemoModeOn()){
+			bg.playDemoMode();
 		}
-		if (input.isKeyDown(Input.KEY_S)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, +.001f)));
-		}
-		if (input.isKeyDown(Input.KEY_A)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(-.001f, 0)));
-		}
-		if (input.isKeyDown(Input.KEY_D)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(+.001f, 0f)));
-		}
+
 		// bounce the ball...
-		boolean bounced = false;
-		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth
-				|| bg.ball.getCoarseGrainedMinX() < 0) {
-			bg.ball.bounce(90);
-			bounced = true;
-		} else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight
-				|| bg.ball.getCoarseGrainedMinY() < 0) {
-			bg.ball.bounce(0);
-			bounced = true;
+		boolean lifeLost = false;
+
+		lifeLost = bg.bounceBallScreen();
+        bg.ball.update(delta);
+
+		if(lifeLost){
+            bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+            bg.loseLife();
+            bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight /2);
+            bg.ball.setVelocity(new Vector(randomSign() * .1f, -.3f));
+
+        }
+
+		//control the paddle
+        bg.controlPaddle();
+        bg.paddle.update(delta);
+
+
+
+        // check if the paddle is bouncing the ball
+		bg.bounceBallPaddle();
+
+		//check for collision with the ball and bricks
+		boolean removedBrick = false;
+		for (Brick b : brickArray){
+			if (!b.getDestroyed()) { //if ball is active
+				if (bg.ball.collides(b) != null) {
+					b.setDestroyed(true);
+					bg.reflectBallFromBrick(b, bg.ball);
+					numberOfBallActive--;
+					b.setPosition(-100, -100);    //remove off screen
+					//brickArray.remove(b);
+					removedBrick = true;
+				}
+			}
 		}
-		if (bounced) {
-			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
-			bounces++;
-		}
-		bg.ball.update(delta);
+
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
@@ -89,15 +141,61 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 10) {
-			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
+		//clear removed bricks
+		if (removedBrick) {
+			bg.incrementCurrentScore();
+			clearDestroyedBricks();
+			System.out.println("Brick Left :" + brickArray.size());
+		}
+
+
+        if (bg.getLivesRemaining() <= 0 ) {
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}
+
+		if ( brickArray.size() == 0){
+		    game.enterState(BounceGame.PLAYINGSTATELEVEL2);
+        }
 	}
 
 	@Override
 	public int getID() {
 		return BounceGame.PLAYINGSTATE;
+	}
+
+	public boolean checkPaddleReflection(PaddleEntity paddle, Ball ball){
+	    float minPaddle = paddle.getxLoc();
+	    float maxPaddle = minPaddle + paddle.getWidth();
+	    float minBall = ball.getCoarseGrainedMinX();
+	    float maxBall = ball.getCoarseGrainedMaxX();
+
+	    if (minBall >= minPaddle && minBall <= maxPaddle )
+	        return true;
+	    else if (maxBall >= minPaddle && maxBall <= maxPaddle)
+	        return true;
+	    else
+	        return false;
+    }
+
+    public static float getRandomFloat(){
+        Random r = new Random();
+        float random = .1f + r.nextFloat() * (.3f + .1f);
+        return random;
+        }
+
+        public int randomSign(){
+            Random r = new Random();
+            return r.nextBoolean() ? 1 : -1;
+        }
+
+	public void clearDestroyedBricks(){
+		Iterator itr = brickArray.iterator();
+		while (itr.hasNext())
+		{
+			Brick x = (Brick) itr.next();
+			if (x.getDestroyed())
+				itr.remove();
+		}
 	}
 	
 }

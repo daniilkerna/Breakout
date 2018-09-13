@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import jig.ResourceManager;
 
+import jig.Vector;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -31,6 +32,10 @@ class StartUpState extends BasicGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		container.setSoundOn(false);
+		BounceGame bg = (BounceGame)game;
+
+		bg.ball.setVelocity(new Vector(.1f, -.2f));
+		bg.ball.setPosition(bg.ScreenWidth / 2, bg.ScreenHeight / 2);
 	}
 
 
@@ -58,20 +63,10 @@ class StartUpState extends BasicGameState {
 			bg.enterState(BounceGame.PLAYINGSTATE);	
 		
 		// bounce the ball...
-		boolean bounced = false;
-		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth
-				|| bg.ball.getCoarseGrainedMinX() < 0) {
-			bg.ball.bounce(90);
-			bounced = true;
-		} else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight
-				|| bg.ball.getCoarseGrainedMinY() < 0) {
-			bg.ball.bounce(0);
-			bounced = true;
-		}
-		if (bounced) {
-			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
-		}
+		bg.bounceBallScreen();
+
 		bg.ball.update(delta);
+		//System.out.println("Ball position" + bg.ball.getPosition());
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {

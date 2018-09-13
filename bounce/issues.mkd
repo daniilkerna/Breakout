@@ -9,5 +9,14 @@
 - **[7]** Use a proper Slick StateBasedGame.
 - **[8]** Use fully specified resource path, preload resources if possible
 
+1. Corrected collision response
+2. Add a controllable paddle
+3. Add lives remaining indicator
+4. Add destructible bricks
+5. Add multiple levels
+6. Add a splash screen
+7. Make levels more interesting
+
 ## Open Issues ##
- 
+
+8. Add a demo Mode
